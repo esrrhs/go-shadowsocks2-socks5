@@ -5,5 +5,5 @@ curl google.com-->ss client-->ss server-->socks5 server-->google.com
 ```
 用法：
 ```
-go-shadowsocks2 -s 'ss://AEAD_CHACHA20_POLY1305:your-password@:8488' -verbose -ss yoursocks5server.com:1080
+go-shadowsocks2-socks5 -s 'ss://AEAD_CHACHA20_POLY1305:your-password@:8488' -verbose -ss yoursocks5server.com:1080
 ```
