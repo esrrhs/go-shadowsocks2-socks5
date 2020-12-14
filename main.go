@@ -27,22 +27,23 @@ var config struct {
 func main() {
 
 	var flags struct {
-		Client     string
-		Server     string
-		Cipher     string
-		Key        string
-		Password   string
-		Keygen     int
-		Socks      string
-		RedirTCP   string
-		RedirTCP6  string
-		TCPTun     string
-		UDPTun     string
-		UDPSocks   bool
-		UDP        bool
-		TCP        bool
-		Plugin     string
-		PluginOpts string
+		Client      string
+		Server      string
+		SocksServer string
+		Cipher      string
+		Key         string
+		Password    string
+		Keygen      int
+		Socks       string
+		RedirTCP    string
+		RedirTCP6   string
+		TCPTun      string
+		UDPTun      string
+		UDPSocks    bool
+		UDP         bool
+		TCP         bool
+		Plugin      string
+		PluginOpts  string
 	}
 
 	flag.BoolVar(&config.Verbose, "verbose", false, "verbose mode")
@@ -52,6 +53,7 @@ func main() {
 	flag.StringVar(&flags.Password, "password", "", "password")
 	flag.StringVar(&flags.Server, "s", "", "server listen address or url")
 	flag.StringVar(&flags.Client, "c", "", "client connect address or url")
+	flag.StringVar(&flags.SocksServer, "ss", "", "socks5 server address")
 	flag.StringVar(&flags.Socks, "socks", "", "(client-only) SOCKS listen address")
 	flag.BoolVar(&flags.UDPSocks, "u", false, "(client-only) Enable UDP support for SOCKS")
 	flag.StringVar(&flags.RedirTCP, "redir", "", "(client-only) redirect TCP from this address")
@@ -176,7 +178,7 @@ func main() {
 			go udpRemote(udpAddr, ciph.PacketConn)
 		}
 		if flags.TCP {
-			go tcpRemote(addr, ciph.StreamConn)
+			go tcpRemote(addr, flags.SocksServer, ciph.StreamConn)
 		}
 	}
 

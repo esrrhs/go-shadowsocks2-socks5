@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
+	"strconv"
 	"sync"
 	"time"
 
@@ -93,7 +94,7 @@ func tcpLocal(addr, server string, shadow func(net.Conn) net.Conn, getAddr func(
 }
 
 // Listen on addr for incoming connections.
-func tcpRemote(addr string, shadow func(net.Conn) net.Conn) {
+func tcpRemote(addr string, socks_server string, shadow func(net.Conn) net.Conn) {
 	l, err := net.Listen("tcp", addr)
 	if err != nil {
 		logf("failed to listen on %s: %v", addr, err)
@@ -127,16 +128,54 @@ func tcpRemote(addr string, shadow func(net.Conn) net.Conn) {
 				return
 			}
 
-			rc, err := net.Dial("tcp", tgt.String())
-			if err != nil {
-				logf("failed to connect to target: %v", err)
-				return
-			}
-			defer rc.Close()
+			if socks_server == "" {
+				rc, err := net.Dial("tcp", tgt.String())
+				if err != nil {
+					logf("failed to connect to target: %v", err)
+					return
+				}
+				defer rc.Close()
 
-			logf("proxy %s <-> %s", c.RemoteAddr(), tgt)
-			if err = relay(sc, rc); err != nil {
-				logf("relay error: %v", err)
+				logf("proxy %s <-> %s", c.RemoteAddr(), tgt)
+				if err = relay(sc, rc); err != nil {
+					logf("relay error: %v", err)
+				}
+			} else {
+				rc, err := net.Dial("tcp", socks_server)
+				if err != nil {
+					logf("failed to connect to target: %v", err)
+					return
+				}
+				defer rc.Close()
+
+				err = Sock5Handshake(rc.(*net.TCPConn), 0, "", "")
+				if err != nil {
+					logf("Sock5Handshake fail: %v %v", tgt, err)
+					return
+				}
+
+				dsthost, dstportstr, err := net.SplitHostPort(tgt.String())
+				if err != nil {
+					logf("SplitHostPort error: %v", err)
+					return
+				}
+
+				dstport, err := strconv.Atoi(dstportstr)
+				if err != nil {
+					logf("Atoi error: %v", err)
+					return
+				}
+
+				err = Sock5SetRequest(rc.(*net.TCPConn), dsthost, dstport, 0)
+				if err != nil {
+					logf("process_proxy_server Sock5SetRequest fail: %v %v", tgt, err)
+					return
+				}
+
+				logf("proxy %s <-%s-> %s", c.RemoteAddr(), socks_server, tgt)
+				if err = relay(sc, rc); err != nil {
+					logf("relay error: %v", err)
+				}
 			}
 		}()
 	}
