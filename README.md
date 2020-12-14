@@ -3,3 +3,7 @@
 ```
 ss client-->ss server->socks5 server
 ```
+用法：
+```
+go-shadowsocks2 -s 'ss://AEAD_CHACHA20_POLY1305:your-password@:8488' -verbose -ss yoursocks5server.com:1080
+```
