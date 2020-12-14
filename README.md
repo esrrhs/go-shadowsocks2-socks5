@@ -7,4 +7,4 @@ curl google.com-->ss client-->ss server-->socks5 server-->google.com
 ```
 go-shadowsocks2-socks5 -s 'ss://AEAD_CHACHA20_POLY1305:your-password@:8488' -verbose -ss yoursocks5server.com:1080
 ```
-如果有多个socks5 server，可以使用[socksfilter](https://github.com/esrrhs/socksfilter)，go-shadowsocks2详细用法参考[go-shadowsocks2](https://github.com/shadowsocks/go-shadowsocks2)
+如果有多个socks5 server，可以使用[socksfilter](https://github.com/esrrhs/socksfilter)，更多go-shadowsocks2详细用法参考[go-shadowsocks2](https://github.com/shadowsocks/go-shadowsocks2)
