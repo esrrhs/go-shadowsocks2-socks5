@@ -1,20 +1,9 @@
-FROM golang:1.15.0-alpine3.12 AS builder
+FROM golang AS build-env
 
-ENV GO111MODULE on
-ENV GOPROXY https://goproxy.cn
+RUN GO111MODULE=off go get -u github.com/esrrhs/go-shadowsocks2-socks5
+RUN GO111MODULE=off go get -u github.com/esrrhs/go-shadowsocks2-socks5/...
+RUN GO111MODULE=off go install github.com/esrrhs/go-shadowsocks2-socks5
 
-RUN apk upgrade \
-    && apk add git \
-    && go get github.com/shadowsocks/go-shadowsocks2
-
-FROM alpine:3.12 AS dist
-
-LABEL maintainer="mritd <mritd@linux.com>"
-
-RUN apk upgrade \
-    && apk add tzdata \
-    && rm -rf /var/cache/apk/*
-
-COPY --from=builder /go/bin/go-shadowsocks2 /usr/bin/shadowsocks
-
-ENTRYPOINT ["shadowsocks"]
+FROM debian
+COPY --from=build-env /go/bin/go-shadowsocks2-socks5 .
+WORKDIR ./
