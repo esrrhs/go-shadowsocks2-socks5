@@ -6,7 +6,6 @@
 [<img src="https://img.shields.io/github/v/release/esrrhs/go-shadowsocks2-socks5">](https://github.com/esrrhs/go-shadowsocks2-socks5/releases)
 [<img src="https://img.shields.io/github/downloads/esrrhs/go-shadowsocks2-socks5/total">](https://github.com/esrrhs/go-shadowsocks2-socks5/releases)
 [<img src="https://img.shields.io/docker/pulls/esrrhs/go-shadowsocks2-socks5">](https://hub.docker.com/repository/docker/esrrhs/go-shadowsocks2-socks5)
-[<img src="https://img.shields.io/github/workflow/status/esrrhs/go-shadowsocks2-socks5/Go">](https://github.com/esrrhs/go-shadowsocks2-socks5/actions)
 
 增加一条ss server到socks5 server的转发链路，方便利用起现有的socks5 server
 ```
