@@ -1,31 +1,54 @@
-#! /bin/sh
+#! /bin/bash
+#set -x
+NAME="go-shadowsocks2-socks5"
 
-go build
-zip go-shadowsocks2-socks5_linux64.zip go-shadowsocks2-socks5
+export GO111MODULE=off
 
-GOOS=darwin GOARCH=amd64 go build
-zip go-shadowsocks2-socks5_mac.zip go-shadowsocks2-socks5
+#go tool dist list
+build_list=$(go tool dist list)
 
-GOOS=windows GOARCH=amd64 go build
-zip go-shadowsocks2-socks5_windows64.zip go-shadowsocks2-socks5.exe
+rm pack -rf
+rm pack.zip -f
+mkdir pack
 
-GOOS=linux GOARCH=mipsle go build
-zip go-shadowsocks2-socks5_mipsle.zip go-shadowsocks2-socks5
+for line in $build_list; do
+  os=$(echo "$line" | awk -F"/" '{print $1}')
+  arch=$(echo "$line" | awk -F"/" '{print $2}')
+  echo "os="$os" arch="$arch" start build"
+  if [ $os == "android" ]; then
+    continue
+  fi
+  if [ $os == "ios" ]; then
+    continue
+  fi
+  if [ $arch == "wasm" ]; then
+    continue
+  fi
+  CGO_ENABLED=0 GOOS=$os GOARCH=$arch go build -ldflags="-s -w"
+  if [ $? -ne 0 ]; then
+    echo "os="$os" arch="$arch" build fail"
+    exit 1
+  fi
+  if [ $os = "windows" ]; then
+    zip ${NAME}_"${os}"_"${arch}"".zip" $NAME".exe"
+    if [ $? -ne 0 ]; then
+      echo "os="$os" arch="$arch" zip fail"
+      exit 1
+    fi
+    mv ${NAME}_"${os}"_"${arch}"".zip" pack/
+    rm $NAME".exe" -f
+  else
+    zip ${NAME}_"${os}"_"${arch}"".zip" $NAME
+    if [ $? -ne 0 ]; then
+      echo "os="$os" arch="$arch" zip fail"
+      exit 1
+    fi
+    mv ${NAME}_"${os}"_"${arch}"".zip" pack/
+    rm $NAME -f
+  fi
+  echo "os="$os" arch="$arch" done build"
+done
 
-GOOS=linux GOARCH=arm go build
-zip go-shadowsocks2-socks5_arm.zip go-shadowsocks2-socks5
+zip pack.zip pack/ -r
 
-GOOS=linux GOARCH=mips go build
-zip go-shadowsocks2-socks5_mips.zip go-shadowsocks2-socks5
-
-GOOS=windows GOARCH=386 go build
-zip go-shadowsocks2-socks5_windows32.zip go-shadowsocks2-socks5.exe
-
-GOOS=linux GOARCH=arm64 go build
-zip go-shadowsocks2-socks5_arm64.zip go-shadowsocks2-socks5
-
-GOOS=linux GOARCH=mips64 go build
-zip go-shadowsocks2-socks5_mips64.zip go-shadowsocks2-socks5
-
-GOOS=linux GOARCH=mips64le go build
-zip go-shadowsocks2-socks5_mips64le.zip go-shadowsocks2-socks5
+echo "all done"
