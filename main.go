@@ -92,7 +92,7 @@ func main() {
 		cipher := flags.Cipher
 		password := flags.Password
 		if flags.Password == "" {
-			password = os.Getenv("SECRET")
+			password = os.Getenv("SS_PASSWORD")
 		}
 		var err error
 
@@ -153,7 +153,7 @@ func main() {
 		cipher := flags.Cipher
 		password := flags.Password
 		if flags.Password == "" {
-			password = os.Getenv("SECRET")
+			password = os.Getenv("SS_PASSWORD")
 		}
 		var err error
 
