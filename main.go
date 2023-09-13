@@ -91,6 +91,9 @@ func main() {
 		addr := flags.Client
 		cipher := flags.Cipher
 		password := flags.Password
+		if flags.Password == "" {
+			password = os.Getenv("SS_PASSWORD")
+		}
 		var err error
 
 		if strings.HasPrefix(addr, "ss://") {
@@ -149,6 +152,9 @@ func main() {
 		addr := flags.Server
 		cipher := flags.Cipher
 		password := flags.Password
+		if flags.Password == "" {
+			password = os.Getenv("SS_PASSWORD")
+		}
 		var err error
 
 		if strings.HasPrefix(addr, "ss://") {
