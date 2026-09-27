@@ -7,7 +7,7 @@ import (
 	"io"
 	"net"
 
-	"github.com/shadowsocks/go-shadowsocks2/internal"
+	"github.com/esrrhs/go-shadowsocks2-socks5/internal"
 )
 
 // payloadSizeMask is the maximum size of payload in bytes.
@@ -205,14 +205,14 @@ func (c *streamConn) initReader() error {
 	if _, err := io.ReadFull(c.Conn, salt); err != nil {
 		return err
 	}
-	if internal.TestSalt(salt) {
-		return ErrRepeatedSalt
-	}
 	aead, err := c.Decrypter(salt)
 	if err != nil {
 		return err
 	}
-	internal.AddSalt(salt)
+
+	if internal.CheckSalt(salt) {
+		return ErrRepeatedSalt
+	}
 
 	c.r = newReader(c.Conn, aead)
 	return nil

@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/shadowsocks/go-shadowsocks2/internal"
+	"github.com/esrrhs/go-shadowsocks2-socks5/internal"
 )
 
 var (

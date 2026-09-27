@@ -14,8 +14,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/shadowsocks/go-shadowsocks2/core"
-	"github.com/shadowsocks/go-shadowsocks2/socks"
+	"github.com/esrrhs/go-shadowsocks2-socks5/core"
+	"github.com/esrrhs/go-shadowsocks2-socks5/socks"
 )
 
 var config struct {
@@ -93,6 +93,9 @@ func main() {
 		addr := flags.Client
 		cipher := flags.Cipher
 		password := flags.Password
+		if flags.Password == "" {
+			password = os.Getenv("SS_PASSWORD")
+		}
 		var err error
 
 		if strings.HasPrefix(addr, "ss://") {
@@ -151,6 +154,9 @@ func main() {
 		addr := flags.Server
 		cipher := flags.Cipher
 		password := flags.Password
+		if flags.Password == "" {
+			password = os.Getenv("SS_PASSWORD")
+		}
 		var err error
 
 		if strings.HasPrefix(addr, "ss://") {
