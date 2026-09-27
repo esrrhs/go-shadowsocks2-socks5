@@ -2,10 +2,10 @@
 
 [<img src="https://img.shields.io/github/license/esrrhs/go-shadowsocks2-socks5">](https://github.com/esrrhs/go-shadowsocks2-socks5)
 [<img src="https://img.shields.io/github/languages/top/esrrhs/go-shadowsocks2-socks5">](https://github.com/esrrhs/go-shadowsocks2-socks5)
-[![Go Report Card](https://goreportcard.com/badge/github.com/esrrhs/go-shadowsocks2-socks5)](https://goreportcard.com/report/github.com/esrrhs/go-shadowsocks2-socks5)
 [<img src="https://img.shields.io/github/v/release/esrrhs/go-shadowsocks2-socks5">](https://github.com/esrrhs/go-shadowsocks2-socks5/releases)
 [<img src="https://img.shields.io/github/downloads/esrrhs/go-shadowsocks2-socks5/total">](https://github.com/esrrhs/go-shadowsocks2-socks5/releases)
 [<img src="https://img.shields.io/docker/pulls/esrrhs/go-shadowsocks2-socks5">](https://hub.docker.com/repository/docker/esrrhs/go-shadowsocks2-socks5)
+[<img src="https://img.shields.io/github/actions/workflow/status/esrrhs/go-shadowsocks2-socks5/go.yml?branch=master">](https://github.com/esrrhs/go-shadowsocks2-socks5/actions)
 
 A fork of [go-shadowsocks2](https://github.com/shadowsocks/go-shadowsocks2) that adds an optional Shadowsocks-to-SOCKS5 backend hop on the server side, so you can reuse an existing SOCKS5 proxy as the egress path.
 
@@ -164,10 +164,14 @@ For full upstream option details (redir, tcptun/udptun, replay-filter env vars, 
 # local binary
 go build -o go-shadowsocks2-socks5
 
-# cross-platform release zips
+# print version
+./go-shadowsocks2-socks5 -version
+
+# cross-platform release packages
 ./pack.sh
 ```
 
+Releases are published automatically by CI when `version/version.go` is updated on `master` (or when a version tag is pushed).
 ## Related Projects
 
 - [go-shadowsocks2](https://github.com/shadowsocks/go-shadowsocks2) — upstream Shadowsocks implementation

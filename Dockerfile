@@ -1,9 +1,8 @@
-FROM golang AS build-env
+FROM golang:1.23 AS build-env
+WORKDIR /src
+COPY . .
+RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o /out/go-shadowsocks2-socks5 .
 
-RUN GO111MODULE=off go get -u github.com/esrrhs/go-shadowsocks2-socks5
-RUN GO111MODULE=off go get -u github.com/esrrhs/go-shadowsocks2-socks5/...
-RUN GO111MODULE=off go install github.com/esrrhs/go-shadowsocks2-socks5
-
-FROM debian
-COPY --from=build-env /go/bin/go-shadowsocks2-socks5 .
-WORKDIR ./
+FROM debian:bookworm-slim
+COPY --from=build-env /out/go-shadowsocks2-socks5 /go-shadowsocks2-socks5
+ENTRYPOINT ["/go-shadowsocks2-socks5"]

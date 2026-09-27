@@ -16,6 +16,7 @@ import (
 
 	"github.com/esrrhs/go-shadowsocks2-socks5/core"
 	"github.com/esrrhs/go-shadowsocks2-socks5/socks"
+	"github.com/esrrhs/go-shadowsocks2-socks5/version"
 )
 
 var config struct {
@@ -44,9 +45,11 @@ func main() {
 		TCP         bool
 		Plugin      string
 		PluginOpts  string
+		Version     bool
 	}
 
 	flag.BoolVar(&config.Verbose, "verbose", false, "verbose mode")
+	flag.BoolVar(&flags.Version, "version", false, "print version and exit")
 	flag.StringVar(&flags.Cipher, "cipher", "AEAD_CHACHA20_POLY1305", "available ciphers: "+strings.Join(core.ListCipher(), " "))
 	flag.StringVar(&flags.Key, "key", "", "base64url-encoded key (derive from password if empty)")
 	flag.IntVar(&flags.Keygen, "keygen", 0, "generate a base64url-encoded random key of given length in byte")
@@ -67,6 +70,11 @@ func main() {
 	flag.BoolVar(&config.TCPCork, "tcpcork", false, "coalesce writing first few packets")
 	flag.DurationVar(&config.UDPTimeout, "udptimeout", 5*time.Minute, "UDP tunnel timeout")
 	flag.Parse()
+
+	if flags.Version {
+		fmt.Println(version.Full())
+		return
+	}
 
 	if flags.Keygen > 0 {
 		key := make([]byte, flags.Keygen)

@@ -1,54 +1,40 @@
 #! /bin/bash
-#set -x
+set -e
 NAME="go-shadowsocks2-socks5"
+VERSION=$(grep -E '^\s*Version\s*=\s*"[^"]+"' version/version.go | sed -E 's/.*"([^"]+)".*/\1/')
+GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo unknown)
+BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+LDFLAGS="-s -w -X 'github.com/esrrhs/go-shadowsocks2-socks5/version.Version=${VERSION}' -X 'github.com/esrrhs/go-shadowsocks2-socks5/version.GitCommit=${GIT_COMMIT}' -X 'github.com/esrrhs/go-shadowsocks2-socks5/version.BuildTime=${BUILD_TIME}'"
 
-export GO111MODULE=off
-
-#go tool dist list
 build_list=$(go tool dist list)
 
-rm pack -rf
-rm pack.zip -f
+rm -rf pack
+rm -f pack.zip
 mkdir pack
 
 for line in $build_list; do
   os=$(echo "$line" | awk -F"/" '{print $1}')
   arch=$(echo "$line" | awk -F"/" '{print $2}')
-  echo "os="$os" arch="$arch" start build"
-  if [ $os == "android" ]; then
+  echo "os=$os arch=$arch start build"
+  if [ "$os" = "android" ] || [ "$os" = "ios" ] || [ "$arch" = "wasm" ]; then
     continue
   fi
-  if [ $os == "ios" ]; then
-    continue
+  BIN_NAME="$NAME"
+  if [ "$os" = "windows" ]; then
+    BIN_NAME="$NAME.exe"
   fi
-  if [ $arch == "wasm" ]; then
-    continue
-  fi
-  CGO_ENABLED=0 GOOS=$os GOARCH=$arch go build -ldflags="-s -w"
-  if [ $? -ne 0 ]; then
-    echo "os="$os" arch="$arch" build fail"
-    exit 1
-  fi
-  if [ $os = "windows" ]; then
-    zip ${NAME}_"${os}"_"${arch}"".zip" $NAME".exe"
-    if [ $? -ne 0 ]; then
-      echo "os="$os" arch="$arch" zip fail"
-      exit 1
-    fi
-    mv ${NAME}_"${os}"_"${arch}"".zip" pack/
-    rm $NAME".exe" -f
+  CGO_ENABLED=0 GOOS=$os GOARCH=$arch go build -ldflags="$LDFLAGS" -o "$BIN_NAME" .
+  ARCHIVE_NAME="${NAME}_${VERSION}_${os}_${arch}"
+  if [ "$os" = "windows" ]; then
+    zip "pack/${ARCHIVE_NAME}.zip" "$BIN_NAME"
+    rm -f "$BIN_NAME"
   else
-    zip ${NAME}_"${os}"_"${arch}"".zip" $NAME
-    if [ $? -ne 0 ]; then
-      echo "os="$os" arch="$arch" zip fail"
-      exit 1
-    fi
-    mv ${NAME}_"${os}"_"${arch}"".zip" pack/
-    rm $NAME -f
+    tar -czvf "pack/${ARCHIVE_NAME}.tar.gz" "$BIN_NAME"
+    rm -f "$BIN_NAME"
   fi
-  echo "os="$os" arch="$arch" done build"
+  echo "os=$os arch=$arch done build"
 done
 
-zip pack.zip pack/ -r
+zip -r pack.zip pack/
 
-echo "all done"
+echo "all done (version $VERSION)"
